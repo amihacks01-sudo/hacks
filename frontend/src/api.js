@@ -1,4 +1,5 @@
-const API_BASE_URL = 'http://127.0.0.1:8000';
+export const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000').replace(/\/$/, '');
+export const DEFAULT_TARGET_URL = import.meta.env.VITE_TARGET_URL || 'http://127.0.0.1:9000';
 
 export async function checkBackendHealth() {
   try {
@@ -11,7 +12,7 @@ export async function checkBackendHealth() {
   }
 }
 
-export async function runScan(file = null, specJsonStr = '', targetUrl = 'http://127.0.0.1:9000', authConfig = null, geminiKey = '') {
+export async function runScan(file = null, specJsonStr = '', targetUrl = DEFAULT_TARGET_URL, authConfig = null, geminiKey = '') {
   const formData = new FormData();
   formData.append('target_url', targetUrl);
 

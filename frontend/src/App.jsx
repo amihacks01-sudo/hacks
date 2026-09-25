@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './index.css';
 import Dashboard from './components/Dashboard';
-import { runScan, replayAttack, checkBackendHealth, fetchScanResult } from './api';
+import { runScan, replayAttack, checkBackendHealth, fetchScanResult, DEFAULT_TARGET_URL } from './api';
 import { Shield, CheckCircle2, AlertCircle, Info, X } from 'lucide-react';
 
 /* COMPACT TOAST NOTIFICATION SYSTEM */
@@ -66,7 +66,7 @@ export default function App() {
     }
   };
 
-  const handleRunScan = async (file = null, specJsonStr = '', targetUrl = 'http://127.0.0.1:9000', geminiKey = '', authConfig = null) => {
+  const handleRunScan = async (file = null, specJsonStr = '', targetUrl = DEFAULT_TARGET_URL, geminiKey = '', authConfig = null) => {
     setLoading(true);
     setScanError(null);
     showToast('info', 'Initiating Sentinel X Security Audit Pipeline...');
@@ -119,7 +119,7 @@ export default function App() {
           <div className="flex items-center gap-4 text-xs font-mono">
             <div className="flex items-center gap-2 bg-[#0c1424] px-3.5 py-1.5 rounded-full border border-[#1b253b]">
               <span className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399]" />
-              <span className="text-slate-300">Sandbox Connected <span className="text-slate-500">127.0.0.1:9000</span></span>
+              <span className="text-slate-300">Sandbox Connected <span className="text-slate-500">{DEFAULT_TARGET_URL}</span></span>
             </div>
 
             <div className="hidden sm:flex items-center gap-2 bg-[#0e1526] px-3.5 py-1.5 rounded-full border border-[#1b253b]">

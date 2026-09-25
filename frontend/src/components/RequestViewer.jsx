@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Terminal, Code, X, Copy, Check, Zap, ShieldAlert, Cpu, AlertTriangle, ShieldCheck, RefreshCw, UserCheck, UserX, Lock, Unlock, Database, Key } from 'lucide-react';
+import { DEFAULT_TARGET_URL } from '../api';
 
 /* COMPACT ANIMATED ATTACK PATH VISUALIZATION COMPONENT */
 function AttackPathVisualizer({ finding }) {
@@ -265,7 +266,7 @@ export default function RequestViewer({ finding, onClose, onReplay }) {
                   {isConfirmed ? '✓ CONFIRMED VULNERABILITY' : 'POTENTIAL VULNERABILITY'}
                 </div>
                 <div className="text-[11px] text-slate-300 font-sans mt-0.5">
-                  Verified against authorized sandbox target <code className="text-cyan-400">http://127.0.0.1:9000</code>
+                  Verified against authorized sandbox target <code className="text-cyan-400">{DEFAULT_TARGET_URL}</code>
                 </div>
               </div>
             </div>

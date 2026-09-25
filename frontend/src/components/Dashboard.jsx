@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Play, Upload, FileText, Target, RefreshCw, Check, AlertTriangle, ShieldCheck, X, Database, ShieldAlert, Cpu, Zap } from 'lucide-react';
 import FindingCard from './FindingCard';
+import { DEFAULT_TARGET_URL } from '../api';
 
 /* ANIMATED SCAN PROGRESS STEPPER COMPONENT */
 function ScanningStepper() {
@@ -36,7 +37,7 @@ function ScanningStepper() {
           SENTINEL X ACTIVE AUDIT PIPELINE
         </h3>
         <p className="text-xs text-slate-400 font-mono">
-          Probing target API on <code className="text-cyan-400">http://127.0.0.1:9000</code>
+          Probing target API on <code className="text-cyan-400">{DEFAULT_TARGET_URL}</code>
         </p>
       </div>
 
@@ -85,7 +86,7 @@ function ScanningStepper() {
 
 export default function Dashboard({ scanData, loading, scanError, onRunScan, onReplayAttack }) {
   const [selectedFile, setSelectedFile] = useState(null);
-  const [targetUrl, setTargetUrl] = useState('http://127.0.0.1:9000');
+  const [targetUrl, setTargetUrl] = useState(DEFAULT_TARGET_URL);
   const [filterCategory, setFilterCategory] = useState('ALL');
   const [showDocModal, setShowDocModal] = useState(false);
   const [geminiKey, setGeminiKey] = useState('');
@@ -267,7 +268,7 @@ export default function Dashboard({ scanData, loading, scanError, onRunScan, onR
                 className="w-full bg-[#050810] border border-[#1b253b] rounded-lg p-3 text-xs font-mono text-cyan-300 focus:outline-none focus:border-cyan-500 transition"
                 value={targetUrl}
                 onChange={(e) => setTargetUrl(e.target.value)}
-                placeholder="http://127.0.0.1:9000"
+                placeholder={DEFAULT_TARGET_URL}
               />
             </div>
 

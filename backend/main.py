@@ -5,13 +5,13 @@ import httpx
 import uvicorn
 from fastapi import FastAPI, HTTPException, UploadFile, File, Form, status
 from fastapi.middleware.cors import CORSMiddleware
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, List, Optional, Union
 
 try:
-    from backend.models import ScanRequest, ScanResponse, Finding, ReplayRequest, ReplayResponse
+    from backend.models import AuthConfig, ScanRequest, ScanResponse, Finding, ReplayRequest, ReplayResponse
     from backend.scanner import run_scan_pipeline
 except ImportError:
-    from models import ScanRequest, ScanResponse, Finding, ReplayRequest, ReplayResponse
+    from models import AuthConfig, ScanRequest, ScanResponse, Finding, ReplayRequest, ReplayResponse
     from scanner import run_scan_pipeline
 
 app = FastAPI(
@@ -35,6 +35,7 @@ FINDINGS_STORE: Dict[str, Finding] = {}
 MOST_RECENT_SCAN_ID: Optional[str] = None
 
 DEMO_SPEC_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "demo", "openapi.json")
+SANDBOX_TARGET_URL = os.getenv("SANDBOX_TARGET_URL", "http://127.0.0.1:9000").rstrip("/")
 
 # ==========================================
 # API ENDPOINTS
@@ -45,7 +46,7 @@ def health_check():
     return {
         "status": "online",
         "engine": "Sentinel X AI API Security Engine",
-        "sandbox_target": "http://127.0.0.1:9000",
+        "sandbox_target": SANDBOX_TARGET_URL,
         "timestamp": datetime.datetime.now(datetime.timezone.utc).isoformat()
     }
 
@@ -53,7 +54,7 @@ def health_check():
 async def scan_openapi_spec(
     file: Optional[UploadFile] = File(None),
     spec_json_str: Optional[str] = Form(None),
-    target_url: str = Form("http://127.0.0.1:9000"),
+    target_url: str = Form(SANDBOX_TARGET_URL),
     auth_config_json: Optional[str] = Form(None),
     gemini_api_key: Optional[str] = Form(None)
 ):
@@ -150,10 +151,10 @@ async def replay_finding_evidence(replay_req: ReplayRequest):
     target_url = req_details.get("url")
 
     # Safety constraint: Replay MUST only target local sandbox API
-    if not target_url or not target_url.startswith("http://127.0.0.1:9000"):
+    if not target_url or not target_url.startswith(SANDBOX_TARGET_URL):
         # Default fallback url
         path = finding.endpoint.replace("{order_id}", "101").replace("{user_id}", "1")
-        target_url = f"http://127.0.0.1:9000{path}"
+        target_url = f"{SANDBOX_TARGET_URL}{path}"
 
     method = req_details.get("method", finding.method or "GET").upper()
     headers = req_details.get("attacker_headers", req_details.get("headers", {}))
@@ -198,4 +199,4 @@ async def replay_finding_evidence(replay_req: ReplayRequest):
 
 if __name__ == "__main__":
     port = int(os.getenv("PORT", 8000))
-    uvicorn.run(app, host="127.0.0.1", port=port)
+    uvicorn.run(app, host="0.0.0.0", port=port)
