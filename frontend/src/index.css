@@ -1,0 +1,65 @@
+/* Sentinel X — Core SOC Design System Styles */
+
+:root {
+  --color-bg: #060911;
+  --color-surface: #0e1526;
+  --color-border: #1b253b;
+  --color-cyan: #00f0ff;
+}
+
+body {
+  background-color: #060911;
+  background-image: 
+    radial-gradient(circle at 50% 0%, rgba(0, 240, 255, 0.07) 0%, transparent 60%),
+    radial-gradient(circle at 100% 100%, rgba(99, 102, 241, 0.05) 0%, transparent 50%),
+    linear-gradient(to right, rgba(27, 37, 59, 0.15) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(27, 37, 59, 0.15) 1px, transparent 1px);
+  background-size: 100% 100%, 100% 100%, 32px 32px, 32px 32px;
+  background-attachment: fixed;
+  color: #f1f5f9;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+/* Technical Monospace Font */
+code, pre, .font-mono {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* Glassmorphism SOC Cards */
+.glass-card {
+  background: rgba(14, 21, 38, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(27, 37, 59, 0.85);
+}
+
+/* Cyber Glow Accent Shadow */
+.electric-glow {
+  box-shadow: 0 0 25px -4px rgba(0, 240, 255, 0.25);
+}
+
+/* Custom Scrollbar for Code & Evidence Viewers */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #1b253b #060911;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #060911;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #1b253b;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #00f0ff;
+}

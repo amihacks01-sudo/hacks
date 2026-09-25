@@ -1,0 +1,259 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Sentinel X Vulnerable Sandbox Target API Spec",
+    "version": "1.0.0",
+    "description": "Authorized OpenAPI 3.0 specification for the local test sandbox running on http://127.0.0.1:9000."
+  },
+  "servers": [
+    {
+      "url": "http://127.0.0.1:9000",
+      "description": "Authorized Local Sandbox Environment"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "Bearer token authentication acquired via /login endpoint"
+      }
+    }
+  },
+  "paths": {
+    "/health": {
+      "get": {
+        "summary": "System Health Status",
+        "description": "Returns operational status and port of the target sandbox API.",
+        "tags": ["System"],
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Healthy operational status",
+            "content": {
+              "application/json": {
+                "example": {
+                  "status": "healthy",
+                  "service": "Sentinel X Vulnerable Sandbox Target API",
+                  "port": 9000
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/login": {
+      "post": {
+        "summary": "User Authentication Login",
+        "description": "Authenticates user credentials and returns a Bearer access token for Alice or Bob.",
+        "tags": ["Auth"],
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["username", "password"],
+                "properties": {
+                  "username": {
+                    "type": "string",
+                    "example": "alice"
+                  },
+                  "password": {
+                    "type": "string",
+                    "example": "alice123"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful authentication returning bearer access token",
+            "content": {
+              "application/json": {
+                "example": {
+                  "access_token": "bearer_token_alice_1",
+                  "token_type": "bearer",
+                  "user_id": "1",
+                  "username": "alice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid credentials provided"
+          }
+        }
+      }
+    },
+    "/users/{user_id}": {
+      "get": {
+        "summary": "Fetch User Profile Details",
+        "description": "Retrieves user record profile information. Harboring excessive sensitive data exposure (password_hash, internal_notes, phone, role).",
+        "tags": ["Users"],
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "description": "Target user identifier (e.g. 1 or 2)",
+            "schema": {
+              "type": "string",
+              "example": "1"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User profile payload with sensitive properties",
+            "content": {
+              "application/json": {
+                "example": {
+                  "id": "1",
+                  "name": "Alice Smith",
+                  "email": "alice@sentinelx.local",
+                  "phone": "+1-555-0199",
+                  "password_hash": "$2b$12$eImiTXuWVxfM37uY4JANjO5E/MockHashForAlice123",
+                  "internal_notes": "VIP Client. High net worth account. Credit limit extended.",
+                  "role": "customer"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User identifier not found"
+          }
+        }
+      }
+    },
+    "/orders/{order_id}": {
+      "get": {
+        "summary": "Retrieve Order by Order ID",
+        "description": "Retrieves detailed order information by order ID. Harboring Broken Object Level Authorization (BOLA/IDOR) vulnerability.",
+        "tags": ["Orders"],
+        "security": [
+          { "BearerAuth": [] }
+        ],
+        "parameters": [
+          {
+            "name": "order_id",
+            "in": "path",
+            "required": true,
+            "description": "Target order identifier (e.g. 101 or 102)",
+            "schema": {
+              "type": "string",
+              "example": "101"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Order details object payload",
+            "content": {
+              "application/json": {
+                "example": {
+                  "order_id": "101",
+                  "owner_id": "1",
+                  "item": "Quantum Crypto Hardware Wallet",
+                  "amount": 499.99,
+                  "status": "shipped"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid authorization bearer token"
+          },
+          "404": {
+            "description": "Order not found"
+          }
+        }
+      }
+    },
+    "/orders": {
+      "post": {
+        "summary": "Create New Purchase Order",
+        "description": "Submits a new purchase order associated with the authenticated caller.",
+        "tags": ["Orders"],
+        "security": [
+          { "BearerAuth": [] }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["item", "amount"],
+                "properties": {
+                  "item": {
+                    "type": "string",
+                    "example": "Security Key Hardware Token"
+                  },
+                  "amount": {
+                    "type": "number",
+                    "example": 79.99
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Order created successfully",
+            "content": {
+              "application/json": {
+                "example": {
+                  "order_id": "103",
+                  "owner_id": "1",
+                  "item": "Security Key Hardware Token",
+                  "amount": 79.99,
+                  "status": "pending"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid authorization bearer token"
+          }
+        }
+      }
+    },
+    "/admin/users": {
+      "get": {
+        "summary": "List All System Users",
+        "description": "Administrative route exposing the array of all user profile records.",
+        "tags": ["Admin"],
+        "security": [
+          { "BearerAuth": [] }
+        ],
+        "responses": {
+          "200": {
+            "description": "Array of all user objects",
+            "content": {
+              "application/json": {
+                "example": [
+                  {
+                    "id": "1",
+                    "name": "Alice Smith",
+                    "email": "alice@sentinelx.local",
+                    "phone": "+1-555-0199",
+                    "password_hash": "$2b$12$eImiTXuWVxfM37uY4JANjO5E/MockHashForAlice123",
+                    "internal_notes": "VIP Client.",
+                    "role": "customer"
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
